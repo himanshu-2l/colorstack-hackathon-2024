@@ -26,7 +26,7 @@ const Layout = () => {
               </Link>
             </li>
           </div>
-          <Link to="/">
+          <Link to="/login">
             <ul class="bg-white text-black drop-shadow-lg rounded-full text-sm px-4 py-2 ">
               Sign Up
             </ul>
