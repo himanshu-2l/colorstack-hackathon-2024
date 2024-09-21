@@ -19,12 +19,13 @@ const upload = multer({ storage: storage });
 // Create a new report
 router.post("/", upload.single("image"), async (req, res) => {
   try {
-    const { title, description } = req.body;
+    const { title, description, typeOfPost } = req.body;
     const imageUrl = req.file ? `/uploads/${req.file.filename}` : null;
 
     const newReport = new Report({
       title,
       description,
+      typeOfPost,
       imageUrl,
     });
 
