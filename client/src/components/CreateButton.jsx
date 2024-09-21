@@ -3,8 +3,7 @@ import { useState, useEffect } from "react";
 const CreateButton = () => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [typeOfPost, setTypeOfPost] = useState("Issue");
-  //   Other possiblity is "Lost and Found"
+  const [isIssue, setIsIssue] = useState(true);
   const [imageURL, setImageURL] = useState("");
 
   // Schema for Reference:
@@ -42,25 +41,51 @@ const CreateButton = () => {
     }
   };
 
+  const handleFileChange = (event) => {
+    const file = event.target.files[0]; // Get the first file selected
+    if (file) {
+      console.log("File Name:", file.name);
+      console.log("File Type:", file.type);
+      console.log("File Size:", file.size, "bytes");
+    }
+  };
+
   return (
     <div>
       <p>create button - schema</p>
       <form onSubmit={handleSubmit}>
         <input
           class="bg-slate-200"
-          value={email}
+          value={title}
           required
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="Email"
+          onChange={(e) => setTitle(e.target.value)}
+          placeholder="Title"
         />
 
         <input
           class="bg-slate-200"
-          value={password}
+          value={description}
           required
-          onChange={(e) => setPassword(e.target.value)}
-          placeholder="Password"
+          onChange={(e) => setDescription(e.target.value)}
+          placeholder="Description"
         />
+
+        <input
+          type="checkbox"
+          class="bg-slate-200"
+          checked={isIssue}
+          required
+          onChange={(e) => setIsIssue(e.target.checked)}
+          placeholder="Issue"
+        />
+
+        <input
+          type="file"
+          accept="image/*"
+          id="contained-button-file"
+          onChange={handleFileChange} // Attach the change event handler
+        />
+
         <input type="submit" value="Submit" />
       </form>
     </div>
