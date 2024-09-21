@@ -1,92 +1,94 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import axios from "axios";
 
 const CreateButton = () => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [isIssue, setIsIssue] = useState(true);
-  const [imageURL, setImageURL] = useState("");
+  const [typeOfPost, setTypeOfPost] = useState("Issue");
+  const [image, setImage] = useState(null);
 
-  // Schema for Reference:
-  //   const ReportSchema = new mongoose.Schema({
-  //     title: { type: String, required: true },
-  //     description: { type: String, required: true },
-  //     typeOfPost: {
-  //       type: String,
-  //       default: "Issue",
-  //       enum: ["Issue", "Lost and found"],
-  //       required: true,
-  //     },
-  //     status: {
-  //       type: String,
-  //       default: "Pending",
-  //       enum: ["Pending", "In Progress", "Resolved"],
-  //     },
-  //     imageUrl: { type: String },
-  //     createdAt: { type: Date, default: Date.now },
-  //   });
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const formData = new FormData();
+    formData.append("title", title);
+    formData.append("description", description);
+    formData.append("typeOfPost", typeOfPost);
+    if (image) {
+      formData.append("image", image);
+    }
 
-  const submitLostFound = async () => {
-    return;
-  };
-
-  const submitIssues = async () => {
-    return;
-  };
-
-  const handleSubmit = () => {
-    if (typeOfPost == "Issue") {
-      submitLostFound();
-    } else {
-      submitIssues();
+    try {
+      const response = await axios.post("http://localhost:3000/api/reports", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      console.log("Report created:", response.data);
+      // Reset form after successful submission
+      setTitle("");
+      setDescription("");
+      setTypeOfPost("Issue");
+      setImage(null);
+    } catch (error) {
+      console.error("Error creating report:", error);
     }
   };
 
   const handleFileChange = (event) => {
-    const file = event.target.files[0]; // Get the first file selected
-    if (file) {
-      console.log("File Name:", file.name);
-      console.log("File Type:", file.type);
-      console.log("File Size:", file.size, "bytes");
-    }
+    setImage(event.target.files[0]);
   };
 
   return (
     <div>
-      <p>create button - schema</p>
+      <h2>Create New Report</h2>
       <form onSubmit={handleSubmit}>
-        <input
-          class="bg-slate-200"
-          value={title}
-          required
-          onChange={(e) => setTitle(e.target.value)}
-          placeholder="Title"
-        />
+        <div>
+          <label htmlFor="title">Title</label>
+          <input
+            id="title"
+            type="text"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            required
+            placeholder="Enter title"
+          />
+        </div>
 
-        <input
-          class="bg-slate-200"
-          value={description}
-          required
-          onChange={(e) => setDescription(e.target.value)}
-          placeholder="Description"
-        />
+        <div>
+          <label htmlFor="description">Description</label>
+          <textarea
+            id="description"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            required
+            placeholder="Enter description"
+            rows="4"
+          />
+        </div>
 
-        <input
-          type="checkbox"
-          class="bg-slate-200"
-          checked={isIssue}
-          required
-          onChange={(e) => setIsIssue(e.target.checked)}
-          placeholder="Issue"
-        />
+        <div>
+          <label htmlFor="typeOfPost">Type of Post</label>
+          <select
+            id="typeOfPost"
+            value={typeOfPost}
+            onChange={(e) => setTypeOfPost(e.target.value)}
+          >
+            <option value="Issue">Issue</option>
+            <option value="Lost and found">Lost and Found</option>
+          </select>
+        </div>
 
-        <input
-          type="file"
-          accept="image/*"
-          id="contained-button-file"
-          onChange={handleFileChange} // Attach the change event handler
-        />
+        <div>
+          <label htmlFor="image">Image (optional)</label>
+          <input
+            id="image"
+            type="file"
+            accept="image/*"
+            onChange={handleFileChange}
+          />
+        </div>
 
-        <input type="submit" value="Submit" />
+        <button type="submit">Submit Report</button>
       </form>
     </div>
   );
