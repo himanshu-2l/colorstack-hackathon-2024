@@ -4,7 +4,6 @@ import viteLogo from "/vite.svg";
 import CreateButton from "./components/CreateButton";
 import { FiExternalLink } from "react-icons/fi";
 import { Link, Outlet } from "react-router-dom";
-import gradient from "./assets/gradient.jpg";
 import { FaExclamation } from "react-icons/fa";
 import { ImCheckmark } from "react-icons/im";
 import checklist from "./assets/checklist.jpg";
@@ -21,7 +20,7 @@ function App() {
       >
         <br></br>
         <div className="flex flex-row">
-          <div className="ml-64 mt-8 w-1/4">
+          <div className="ml-52 mt-8 w-1/5">
             <div className="text-6xl font-mono">
               <h1>Find.</h1>
               <h1>Share.</h1>
