@@ -1,106 +1,93 @@
 const express = require('express');
-const Model = require('../models/model');
+const User = require('../models/user');
 const router = express.Router();
-const multer = require('multer');
-const storage = require('../firebaseConfig');
-const upload = multer({ storage: multer.memoryStorage() });
 
-//Post Method
-router.post('/post', async (req, res) => {
-    const data = new Model({
-        name: req.body.name,
-        age: req.body.age
-    })
+// Register route should come before the /:id routes
+router.post('/register', async (req, res) => {
+  try {
+    const { NameFirst, NameLast, email, Pass, Admin } = req.body;
+    const newUser = new User({
+      NameFirst,
+      NameLast,
+      email,
+      Pass,
+      Admin
+    });
 
-    try {
-        const dataToSave = await data.save();
-        res.status(200).json(dataToSave)
-    }
-    catch (error) {
-        res.status(400).json({ message: error.message })
-    }
-})
+    const savedUser = await newUser.save();
+    res.status(201).json(savedUser);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+});
 
-//Get all Method
-router.get('/getAll', async (req, res) => {
-    try {
-        const data = await Model.find();
-        res.json(data)
-    }
-    catch (error) {
-        res.status(500).json({ message: error.message })
-    }
-})
+// Login route
+router.post('/login', async (req, res) => {
+  try {
+    const { email, Pass } = req.body;
 
+    // Find user by email
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(401).json({ message: 'Login failed' });
+    }
 
-//Get by ID Method
-router.get('/getOne/:id', async (req, res) => {
-    try {
-        const data = await Model.findById(req.params.id);
-        res.json(data)
-    }
-    catch (error) {
-        res.status(500).json({ message: error.message })
-    }
-})
+    // Check password (use bcrypt in production to hash passwords)
+    const isMatch = Pass === user.Pass; // Use bcrypt.compare in production
 
-//Update by ID Method
-router.patch('/update/:id', async (req, res) => {
-    try {
-        const id = req.params.id;
-        const updatedData = req.body;
-        const options = { new: true };
+    if (!isMatch) {
+      return res.status(401).json({ message: 'Login failed' });
+    }
 
-        const result = await Model.findByIdAndUpdate(
-            id, updatedData, options
-        )
+    // Login successful
+    res.status(200).json({ message: 'Login successful', user });
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).json({ message: error.message });
+  }
+});
 
-        res.send(result)
-    }
-    catch (error) {
-        res.status(500).json({ message: error.message })
-    }
-})
+// Get all users
+router.get('/', async (req, res) => {
+  try {
+    const users = await User.find();
+    res.json(users);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
 
-//Delete by ID Method
-router.delete('/delete/:id', async (req, res) => {
-    try {
-        const id = req.params.id;
-        const data = await Model.findByIdAndDelete(id)
-        res.send(`Document with ${data.name} has been deleted..`)
-    }
-    catch (error) {
-        res.status(400).json({ message: error.message })
-    }
-})
+// Get a single user by ID
+router.get('/:id', async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+    res.json(user);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
 
-// Corrected upload route
-router.post('/upload', upload.single('image'), async (req, res) => {
-    if (!req.file) {
-      return res.status(400).send('No file uploaded.');
-    }
-  
-    try {
-      const { ref, uploadBytes, getDownloadURL } = require('firebase/storage'); // Ensure this is imported correctly
-      const { storage } = require('../firebaseConfig'); // Make sure storage is properly initialized
-  
-      const file = req.file;
-      const fileRef = ref(storage, `images/${Date.now()}-${file.originalname}`); // Create a reference to the storage location
-  
-      // Upload the file buffer
-      await uploadBytes(fileRef, file.buffer);
-  
-      // Get the download URL of the uploaded image
-      const url = await getDownloadURL(fileRef);
-  
-      // Save the URL somewhere (e.g., in the array or database)
-      imageUrls.push(url); // Add the URL to the in-memory array or replace with database save
-  
-      res.status(200).json({ url });
-    } catch (error) {
-      res.status(500).send(error.message);
-    }
-  });
-  
+// Update a user
+router.patch('/:id', async (req, res) => {
+  try {
+    const updatedUser = await User.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    if (!updatedUser) return res.status(404).json({ message: 'User not found' });
+    res.json(updatedUser);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+});
+
+// Delete a user
+router.delete('/:id', async (req, res) => {
+  try {
+    const deletedUser = await User.findByIdAndDelete(req.params.id);
+    if (!deletedUser) return res.status(404).json({ message: 'User not found' });
+    res.json({ message: 'User deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
 
 module.exports = router;

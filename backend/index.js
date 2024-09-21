@@ -33,7 +33,7 @@ app.use("/uploads", express.static("uploads")); // Serve static files from the u
 // Use routes from the reports module
 app.use("/api/reports", routes);
 
-app.use("/api", routes2);
+app.use("/api/users", routes2);
 
 // Start the server
 const PORT = process.env.PORT || 3000;
