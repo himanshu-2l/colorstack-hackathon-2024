@@ -29,10 +29,10 @@ Marco is a modern web application designed to help university students find lost
   - Vite for fast development and building
   - React Icons for UI icons
 
-## 🌟 Key Highlights
+## 🌟 Key Highlights 
 
 ### Post Familiarity Detection
 Our system uses advanced algorithms to detect similar posts, helping to:
-- Reduce duplicate reports
-- Connect users with similar issues or lost items
-- Improve overall efficiency of the platform
+- Reduce duplicate reports.
+- Connect users with similar issues or lost items.
+- Improve overall efficiency of the platform.
